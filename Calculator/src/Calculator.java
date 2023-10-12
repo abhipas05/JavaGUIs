@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Random;
 
 public class Calculator implements ActionListener{
@@ -139,35 +140,7 @@ public class Calculator implements ActionListener{
 
 
     public static void main(String[] args) {
-//        new Calculator();
-        int count = 0;
-        while (count < 10) {
-            specialLoop:
-            for (int i = 0; i < 8; i++) {
-                for (int j = 0; j < 7; j++) {
-                    System.out.print(i + "     ");
-                    System.out.println(j);
-                    if (i + j > 5) {
-                        break specialLoop;
-                    }
-                }
-            }
-            count++;
-        }
-
-        System.out.println("done");
-    }
-
-    public static boolean contains(int[][] square, int value) {
-        boolean result = false;
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                if (square[i][j] == value) {
-                    result = true;
-                }
-            }
-        }
-        return result;
+        new Calculator();
     }
 
     public void delete() {
@@ -182,11 +155,40 @@ public class Calculator implements ActionListener{
         if (!textField.getText().equals("")) {
             textField.setText("");
         }
+        op = null;
+        mem1 = null;
+        mem2 = null;
     }
     public void selectOperator(String operator) {
-        op = operator;
-        mem1 = textField.getText();
-        textField.setText("");
+        if (Objects.nonNull(op)) {
+            System.out.println("this was triggered");
+            String temp = mem1;
+            String temp2 = textField.getText();
+            mem1 = continuousCalculation(op, temp, temp2);
+            textField.setText("");
+            op = operator;
+        } else {
+            op = operator;
+            mem1 = textField.getText();
+            textField.setText("");
+        }
+    }
+
+    public String continuousCalculation(String op, String o1, String o2) {
+        float num1 = Float.parseFloat(o1);
+        float num2 = Float.parseFloat(o2);
+        switch(op) {
+            case "+":
+                return Float.toString(num1 + num2);
+            case "-":
+                return Float.toString(num1 - num2);
+            case "x":
+                return Float.toString(num1 * num2);
+            case "/":
+                return Float.toString(num1 / num2);
+            default:
+                return "-1";
+        }
     }
     public void append(String text) {
         if (textField.getText().equals("0") || textField.getText().equals("0.0")) {
@@ -206,18 +208,26 @@ public class Calculator implements ActionListener{
             case "+":
                 result = num1 + num2;
                 textField.setText(Float.toString(result));
+                mem1 = Float.toString(result);
+                op = null;
                 break;
             case "-":
                 result = num1 - num2;
                 textField.setText(Float.toString(result));
+                mem1 = Float.toString(result);
+                op = null;
                 break;
             case "x":
                 result = num1 * num2;
                 textField.setText(Float.toString(result));
+                mem1 = Float.toString(result);
+                op = null;
                 break;
             case "/":
                 result = num1 / num2;
                 textField.setText(Float.toString(result));
+                mem1 = Float.toString(result);
+                op = null;
                 break;
         }
         fixOutput();
@@ -283,7 +293,9 @@ public class Calculator implements ActionListener{
             } else if (event == C) {
                 clear();
             } else if (event == decimal) {
-                append(".");
+                if (!textField.getText().contains(".")) {
+                    append(".");
+                }
             }
         }
     };
